@@ -1,0 +1,60 @@
+<p-toast></p-toast>
+
+<div class="surface-ground flex align-items-center justify-content-center min-h-screen p-4">
+  <div class="flex flex-column align-items-center justify-content-center w-full">
+    <div class="p-1 border-round-lg"
+      style="background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
+
+      <div class="surface-card p-5 sm:p-6 border-round-xl shadow-2 max-w-sm md:max-w-lg w-full">
+
+        <div class="text-center mb-5">
+          <h2 class="text-900 font-bold text-3xl">Primeiro Acesso</h2>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-column gap-4">
+
+          <!-- Novo Nome -->
+          <div>
+            <label for="newName" class="block text-900 text-lg font-medium mb-2">Novo Nome</label>
+            <input id="newName" type="text" formControlName="newName" placeholder="Digite seu nome" pInputText
+              class="w-full border-round-lg"
+              [ngClass]="{ 'p-invalid': form.controls['newName'].invalid && form.controls['newName'].touched }">
+          </div>
+
+          <!-- Nova Senha -->
+          <div>
+            <label for="newPassword" class="block text-900 font-medium text-lg mb-2">Nova Senha</label>
+            <p-password id="newPassword" formControlName="newPassword" [feedback]="false"
+              placeholder="Digite sua nova senha" [toggleMask]="true" inputStyleClass="w-full border-round-lg"
+              [ngClass]="{ 'p-invalid': form.controls['newPassword'].invalid && form.controls['newPassword'].touched }">
+            </p-password>
+          </div>
+
+          <!-- Confirmar Nova Senha -->
+          <div>
+            <label for="confirmPassword" class="block text-900 font-medium text-lg mb-2">Confirmar Nova Senha</label>
+            <p-password id="confirmPassword" formControlName="confirmPassword" [feedback]="false"
+              placeholder="Confirme sua nova senha" [toggleMask]="true" inputStyleClass="w-full border-round-lg"
+              [ngClass]="{ 'p-invalid': form.controls['confirmPassword'].invalid && form.controls['confirmPassword'].touched }">
+            </p-password>
+          </div>
+          <small
+            *ngIf="form.hasError('mismatch') && (form.controls['confirmPassword'].dirty || form.controls['confirmPassword'].touched)"
+            class="text-red-500">
+            As senhas não coincidem
+          </small>
+
+          <!-- Botões -->
+          <div class="flex gap-3">
+            <button type="submit" pButton pRipple label="Salvar" class="w-full text-lg border-round-lg"
+              [disabled]="busy"></button>
+            <button type="button" pButton pRipple label="Cancelar"
+              class="w-full text-lg border-round-lg p-button-secondary" (click)="form.reset()"></button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+.payment-credit {
+  background-color: #2196f3; /* Roxo claro */
+  color: #1b3d9a; /* Roxo escuro */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease;
+}
+
+.payment-cash {
+  background-color: #34913c; /* Verde claro */
+  color: #2e7d32; /* Verde escuro */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease;
+}
+
+.payment-pix {
+  background-color: #d6790e; /* Azul claro */
+  color: #aa7f21; /* Azul escuro */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease;
+}
+
+.payment-debit {
+  background-color: #d8c40e; /* Amarelo claro */
+  color: #f5e500; /* Laranja escuro */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease;
+}
+
+.payment-total {
+  background-color: #726d6d; /* Cinza claro */
+  color: #424242; /* Preto */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease;
+}
+
+.payment-others {
+  background-color: #524d4d; /* Cinza neutro */
+  color: #616161; /* Cinza escuro */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease;
+}

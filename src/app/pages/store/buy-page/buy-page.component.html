@@ -1,0 +1,73 @@
+<form [formGroup]="form" class="card form-container py-2 mt-1" (keydown.enter)="submit()">
+  <div class="form-item">
+    <span class="font-bold block mb-2">Nome do Produto</span>
+    <input pInputText type="text" [(ngModel)]="searchQuery" (input)="filterProducts()" class="w-full" pInputText
+      id="product" formControlName="title"
+      [ngClass]="{'uk-form-danger': (!form.controls['title'].valid && !form.controls['title'].pristine) }" />
+  </div>
+  <div class="form-actions">
+    <span class="font-bold block mb-2">Ação</span>
+    <div class="actions-container">
+      <p-button class="" icon="pi pi-check" label="Salvar" (click)="submit()" *ngIf="!busy"></p-button>
+      <p-button class="p-button-danger" label="Cancelar" icon="pi pi-times" (click)="resetForm();"
+        styleClass="p-button-danger"></p-button>
+    </div>
+  </div>
+</form>
+<div class="card pt-1 pb-1 mb-0">
+  <p-toast></p-toast>
+  <p-toolbar styleClass="mb-4 gap-2">
+    <ng-template pTemplate="left">
+      <button pButton pRipple [label]="'Excluir Selecionados'" icon="pi pi-trash" class="p-button-danger"
+        (click)="confirmDeleteSelected()" [disabled]="!selectedProducts || !selectedProducts.length">
+      </button>
+      <div class="m-2"></div>
+      <button pButton pRipple label="Gerar PDF" icon="pi pi-file-pdf" class="p-button-warning" (click)="generatePDF()"
+        [disabled]="!selectedProducts || !selectedProducts.length">
+      </button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table [value]="filteredProducts" selectionMode="multiple" [(selection)]="selectedProducts"
+    [metaKeySelection]="metaKeySelection" dataKey="_id" editMode="row" [scrollable]="true" scrollHeight="460px"
+    class="responsive-table">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width:3%">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th style="width:25%"> Produto </th>
+        <th style="width:5%"> Ação </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-product let-editing="editing" let-ri="rowIndex">
+      <tr [pSelectableRow]="product" [pEditableRow]="product">
+        <td>
+          <p-tableCheckbox [value]="product"></p-tableCheckbox>
+        </td>
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input pInputText type="text" [(ngModel)]="product.title" required />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ product.title }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td style="text-align: center">
+          <div class="flex align-items-center justify-content-center gap-2">
+            <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil"
+              class="p-button-rounded p-button-warning p-button-outlined"></button>
+            <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check"
+              (click)="onRowEditSave(product)" class="p-button-rounded p-button-text p-button-success"></button>
+            <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times"
+              (click)="onRowEditCancel(product, ri)" class="p-button-rounded p-button-text p-button-danger"></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<p-confirmDialog></p-confirmDialog>

@@ -1,0 +1,83 @@
+.space{
+  margin-left: 16.668%;
+}
+.payment-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+}
+
+.info{
+  color:#fc9e11;
+}
+
+
+:host ::ng-deep .p-datatable tbody tr:hover {
+  background-color: #ffffff36 !important;
+  cursor: pointer;
+}
+
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row; /* Colocar ícone e texto lado a lado */
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #60a5fa;
+  border-radius: 6px;
+  cursor: pointer;
+  width: auto; /* Ajustar a largura automaticamente */
+  height: auto; /* Ajustar a altura automaticamente */
+  text-align: center;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+
+.payment-option.selected {
+  border-color: #007ad9;
+  background-color: #193247;
+}
+
+.payment-option i {
+  font-size: 1.2rem; /* Tamanho do ícone */
+  margin-right: 0.5rem; /* Espaçamento entre o ícone e o texto */
+  color: #60a5fa; /* Cor do texto */
+}
+
+.payment-option span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #60a5fa; /* Cor do texto */
+}
+/* Botão Responsivo */
+/* Estilo Responsivo para o Botão */
+:host ::ng-deep .responsive-button .p-button-label {
+  display: inline-block; /* Exibe o texto por padrão */
+}
+
+:host ::ng-deep .payment-width {
+  width: 36.6667%
+}
+
+:host ::ng-deep .small-input {
+  width: 80px !important;  /* Ajuste o tamanho conforme necessário */
+}
+@media screen and (max-width: 500px) {
+  :host ::ng-deep  .responsive-button .p-button-label {
+    display: none !important; /* Esconde o texto em telas menores */
+  }
+
+  :host ::ng-deep  .responsive-button {
+    justify-content: center; /* Garante o alinhamento central do ícone */
+    width: 100%; /* Ajusta o botão para o tamanho total, se necessário */
+  }
+  :host ::ng-deep .payment-width {
+    width: auto;
+  }
+
+  .space{
+    margin-left: 0%;
+  }
+
+}
+

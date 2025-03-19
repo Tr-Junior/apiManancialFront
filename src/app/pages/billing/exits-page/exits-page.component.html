@@ -1,0 +1,163 @@
+<div [formGroup]="form" class="card">
+  <div class="formgroup-inline">
+    <div class="field">
+      <span class="font-bold block mb-2">Nome da despesa</span>
+      <label htmlFor="lastname1" class="p-sr-only">Nome da despesa</label>
+      <input formControlName="description" pInputText type="text" [ngClass]="{
+          danger:
+            !form.controls['description'].valid &&
+            !form.controls['description'].pristine
+        }" />
+    </div>
+    <div class="field">
+      <span class="font-bold block mb-2">Valor da despesa</span>
+      <label htmlFor="firstname1" class="p-sr-only">Firstname</label>
+      <input pInputText currencyMask [options]="{ prefix: 'R$ ', thousands: '.', decimal: ',' }" formControlName="value"
+        id="productPurchasePrice"
+        [ngClass]="{ danger: !form.controls['value'].valid && !form.controls['value'].pristine}" />
+    </div>
+    <div class="field">
+      <span class="font-bold block mb-2">Forma de Pagamento</span>
+      <p-dropdown formControlName="formPaymentExit" styleClass="ng-dirty ng-invalid" placeholder="Selecione"
+        [options]="formPaymentOptions" optionLabel="label" optionValue="value" [ngClass]="{
+          danger:
+            !form.controls['formPaymentExit'].valid && !form.controls['formPaymentExit'].pristine
+        }">
+      </p-dropdown>
+    </div>
+    <div class="field">
+      <span class="font-bold block mb-2">Data da Despesa</span>
+      <p-calendar formControlName="date" [showIcon]="true" dateFormat="dd/mm/yy" [locale]="ptBR" [ngClass]="{
+          danger:
+            !form.controls['date'].valid && !form.controls['date'].pristine
+        }"></p-calendar>
+    </div>
+    <div class="card flex justify-content">
+      <p-button icon="pi pi-check" label="Salvar" (click)="submit()"></p-button>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="font-bold bg-gray-500 text-gray-900 m-2 px-4 py-2 border-rounded md:col-span-2"
+      [ngClass]="paymentTotals[paymentTotals.length - 1].color">
+      {{ paymentTotals[paymentTotals.length - 1].formPayment }}: {{ paymentTotals[paymentTotals.length - 1].total |
+      currency: 'BRL':'symbol':'1.2-2' }}
+    </div>
+    <div class="font-bold text-gray-900 m-2 px-4 py-2 border-rounded" [ngClass]="paymentTotal.color"
+      *ngFor="let paymentTotal of paymentTotals.slice(0, paymentTotals.length - 1)">
+      {{ paymentTotal.formPayment }}: {{ paymentTotal.total | currency: 'BRL':'symbol':'1.2-2' }}
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-end">
+    <span class="p-input-icon-left m-2">
+      <p-calendar [(ngModel)]="rangeDates" selectionMode="range" [showIcon]="true" [locale]="ptBR" dateFormat="dd/mm/yy"
+        [readonlyInput]="true" styleClass="customCalendarClass"></p-calendar>
+      <span class="mx-2"></span>
+      <button pButton type="button" label="Pesquisar" icon="pi pi-search" (click)="searchDate()"></button>
+      <span class="px-2"></span>
+      <button pButton type="button" label="Limpar" icon="pi pi-times" (click)="clearSearch()"></button>
+    </span>
+  </div>
+  <p-table [value]="exits" dataKey="_id" editMode="row" [tableStyle]="{'min-width': '50rem'}" [paginator]="true"
+    [rows]="100" [showCurrentPageReport]="true" [tableStyle]="{ 'min-width': '50rem' }"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} Saídas"
+    [rowsPerPageOptions]="[ 100, 150, 200, 250, 350, 500]" [tableStyle]="{'min-width': '50rem'}"
+    styleClass="p-datatable-striped">
+    <ng-template pTemplate="caption">
+      <div class="flex">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" [(ngModel)]="searchQuery" (ngModelChange)="search()"
+            placeholder="Pesquisar saídas..." />
+          <p-button icon="pi pi-times" styleClass=" p-button-danger p-button-text" (onClick)="clearSearch()"
+            [disabled]="!searchQuery"></p-button>
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="text-align: center">#</th>
+        <th style="text-align: center">Tipo da despesa</th>
+        <th style="text-align: center">Valor da despesa</th>
+        <th style="text-align: center">Forma de pagamento</th>
+        <th style="text-align: center">Data da despesa</th>
+        <th style="text-align: center">Ações</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-exits let-editing="editing" let-ri="rowIndex">
+      <tr [pEditableRow]="exits">
+        <td style="text-align: center">
+          {{ri+1}}
+        </td>
+        <td style="text-align: center">
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input pInputText type="text" [(ngModel)]="selectedExits.description" required>
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{exits.description}}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td style="text-align: center">
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <p-inputNumber pKeyFilter="num" inputId="currency-user" mode="currency" currency="BRL" locale="pt"
+                [(ngModel)]="selectedExits.value" [required]="true"></p-inputNumber>
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{exits.value | currency: 'BRL':'symbol':'1.2-2' }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td style="text-align: center">
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <p-dropdown [(ngModel)]="selectedExits.formPaymentExit" class="ui-dropdown-panel"
+                [options]="formPaymentOptions" [required]="true"
+                [style]="{'overflow': 'visible', 'position': 'static'}"></p-dropdown>
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{exits.formPaymentExit}}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td style="text-align: center">
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input pInputText type="text" [(ngModel)]="selectedExits.date" [readOnly]="true">
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{exits.date | date: "dd/MM/yyyy"}}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td style="text-align: center">
+          <div class="flex align-items-center justify-content-center gap-3">
+            <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil"
+              (click)="onRowEditInit(exits)" class="p-button-rounded p-button-warning p-button-outlined">
+            </button>
+            <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check"
+              (click)="onRowEditSave(exits)" class="p-button-rounded p-button-text p-button-success mr-2">
+            </button>
+            <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times"
+              (click)="onRowEditCancel(exits)" class="p-button-rounded p-button-text p-button-danger">
+            </button>
+
+
+            <p-button *ngIf="!editing" icon="pi pi-trash"
+              styleClass="p-button-rounded p-button-danger p-button-outlined" (click)="confirmDelete(exits)"></p-button>
+
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <h5 class="uk-text-center" *ngIf="exits.length == 0">Não há Produtos Cadastrados</h5>
+
+</div>
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

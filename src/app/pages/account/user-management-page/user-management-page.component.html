@@ -1,0 +1,27 @@
+<div class="card">
+  <p-table [value]="user">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>#</th>
+        <th>Nome</th>
+        <th>Tipo de usuário</th>
+        <th>Opções</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-user>
+      <tr>
+        <td> <p-avatar label="{{ user.name.charAt(0) }}" shape="circle"
+            styleClass="mr-2 bg-primary text-white"></p-avatar></td>
+        <td>{{ user.name}}</td>
+        <td>{{ user.roles }}</td>
+        <td>
+          <button pButton pRipple type="button" icon="pi pi-trash" (click)="confirmDelete(user)" text rounded
+          severity="danger">
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>

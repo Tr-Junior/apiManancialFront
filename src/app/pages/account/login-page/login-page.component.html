@@ -1,0 +1,39 @@
+<p-toast></p-toast>
+
+<div class="surface-ground flex align-items-center justify-content-center p-4">
+  <div class="flex flex-column align-items-center justify-content-center w-full">
+    <div class="p-1 border-round-lg"
+      style="background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
+
+      <div class="surface-card p-5 sm:p-6 border-round-xl shadow-2 max-w-sm md:max-w-lg w-full">
+
+        <div class="text-center mb-5">
+          <h2 class="text-900 font-bold text-3xl">Bem-vindo!</h2>
+          <p class="text-600 text-lg">Faça o login para continuar</p>
+        </div>
+
+        <form [formGroup]="form" (submit)="submit()">
+          <!-- Usuário -->
+          <div class="mb-4">
+            <label for="name" class="block text-800 text-lg font-medium mb-2">Usuário</label>
+            <input id="name" type="text" formControlName="name" placeholder="Digite seu usuário" pInputText
+              class="w-full border-round-lg">
+          </div>
+
+          <!-- Senha -->
+          <div class="mb-4">
+            <label for="password" class="block text-800 text-lg font-medium mb-2">Senha</label>
+            <p-password id="password" formControlName="password" [feedback]="false" placeholder="Digite sua senha"
+              [toggleMask]="true" inputStyleClass="w-full border-round-lg">
+            </p-password>
+          </div>
+
+          <!-- Botão de Login -->
+          <button type="submit" pButton pRipple label="Entrar" class="w-full text-lg border-round-lg" pHotkey="enter">
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>

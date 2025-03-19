@@ -1,0 +1,44 @@
+<div class="card">
+  <div class="flex flex-wrap items-center justify-between gap-4 p-4">
+    <!-- Calendário e Botões -->
+    <div class="flex items-center gap-2">
+      <p-calendar [(ngModel)]="rangeDates" selectionMode="range" [showIcon]="true" [locale]="ptBR" dateFormat="dd/mm/yy"
+        [readonlyInput]="true" styleClass="customCalendarClass"></p-calendar>
+      <button pButton type="button" label="Pesquisar" icon="pi pi-search" (click)="searchDate()"></button>
+      <button pButton type="button" label="Limpar" icon="pi pi-times" (click)="clearSearch()"></button>
+    </div>
+    <div class="flex items-center justify-center text-xl font-bold bg-primary text-white border-round px-4 py-2">
+      Valor Total em estoque {{ totalPurchaseValue | currency: 'BRL':'symbol':'1.2-2' }}
+    </div>
+  </div>
+</div>
+<div class="grid">
+  <div class="col">
+    <div class="text-center p-3 border-round-sm card font-bold">
+      <h2>Total de Entradas</h2>
+      <div class="text-green-600 font-bold text-xl">
+        {{ totalEntrances | currency: 'BRL':'symbol':'1.2-2' }}
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="text-center p-3 border-round-sm card font-bold ">
+      <h2>Total de Saídas</h2>
+      <div class="text-red-600 font-bold text-xl">
+        {{ totalExits | currency: 'BRL':'symbol':'1.2-2' }}
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="text-center p-3 border-round-sm card font-bold ">
+      <h2>Saldo Total</h2>
+      <div class="text-yellow-600 font-bold text-xl" [ngClass]="{'positive': result >= 0, 'negative': result < 0}">
+        {{ result | currency: 'BRL':'symbol':'1.2-2' }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <app-chart-page></app-chart-page>
+</div>

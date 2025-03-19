@@ -1,0 +1,55 @@
+<div [formGroup]="form" class="card form-container p-fluid p-grid p-align-center mt-3">
+  <div class="field col">
+    <span class="font-bold block mb-1">Nome do Produto</span>
+    <input pInputText id="product" formControlName="title"
+      [ngClass]="{'uk-form-danger': (!form.controls['title'].valid && !form.controls['title'].pristine) }" />
+  </div>
+  <div class="field col">
+    <span class="font-bold block mb-1 truncate" pTooltip="Quantidade" tooltipPosition="top">Estoque</span>
+    <p-inputNumber formControlName="quantity" id="productQuantity" inputId="integeronly"
+      [ngClass]="{'uk-form-danger': (!form.controls['quantity'].valid && !form.controls['quantity'].pristine) }">
+    </p-inputNumber>
+  </div>
+  <div class="field col">
+    <span class="font-bold block mb-1">Fornecedor</span>
+    <p-autoComplete formControlName="supplier" [suggestions]="filteredSuppliers"
+      (completeMethod)="filterSuppliers($event)" (onSelect)="onSupplierSelect($event)" field="name" [dropdown]="true"
+      [showClear]="true" placeholder="Selecione um fornecedor">
+
+      <ng-template let-supplier pTemplate="item">
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+          <span>{{ supplier.name }}</span>
+          <button pButton type="button" icon="pi pi-trash" class="p-button-text p-button-danger"
+            (click)="deleteSupplier(supplier, $event)" size="small">
+          </button>
+        </div>
+      </ng-template>
+
+    </p-autoComplete>
+  </div>
+  <div class="field col">
+    <span class="font-bold block mb-1 truncate" pTooltip="Custo" tooltipPosition="top">Valor de compra</span>
+    <p-inputGroup>
+      <p-inputGroupAddon>R$</p-inputGroupAddon>
+      <p-inputNumber id="purchasePrice" formControlName="purchasePrice"
+        [ngClass]="{'uk-form-danger': (!form.controls['purchasePrice'].valid && !form.controls['purchasePrice'].pristine) }"
+        inputId="minmaxfraction" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" />
+    </p-inputGroup>
+  </div>
+  <div class="field col">
+    <span class="font-bold block mb-1 truncate" pTooltip="Valor de venda" tooltipPosition="top">Valor de venda</span>
+    <p-inputGroup>
+      <p-inputGroupAddon>R$</p-inputGroupAddon>
+      <p-inputNumber id="price" formControlName="price"
+        [ngClass]="{'uk-form-danger': (!form.controls['price'].valid && !form.controls['price'].pristine) }"
+        inputId="minmaxfraction" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" />
+    </p-inputGroup>
+  </div>
+  <div class="field col buttons-container text-center pt-5">
+    <p-button class="mr-2" icon="pi pi-check" label="Salvar" (click)="submit()" *ngIf="!busy"></p-button>
+    <p-button class="p-button-danger" label="Cancelar" icon="pi pi-times" (click)="resetForm();"
+      styleClass="p-button-danger"></p-button>
+  </div>
+</div>
+<p-confirmDialog></p-confirmDialog> <!-- Caixa de confirmação -->
+<p-toast></p-toast>

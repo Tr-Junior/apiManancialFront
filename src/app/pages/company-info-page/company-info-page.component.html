@@ -1,0 +1,78 @@
+<p-divider>Informações da empresa</p-divider>
+<div class="card">
+  <div [formGroup]="form" class="formgrid grid">
+    <div class="field col-12 md:col-6">
+      <label for="cnpj">CNPJ</label>
+      <input formControlName="cnpj" pInputText id="cnpj" type="text"
+        class="text-base text-color p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+    </div>
+    <div class="field col-12 md:col-6">
+      <label for="name">Nome fantasia</label>
+      <input formControlName="name" pInputText id="name" type="text"
+        class="text-base text-color p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+    </div>
+  </div>
+</div>
+<p-divider>Contato</p-divider>
+<div class="card">
+  <div [formGroup]="form" class="formgrid grid">
+    <div class="field col-12 md:col-6">
+      <label for="email">Email</label>
+      <input formControlName="email" pInputText id="email" type="text"
+        class="text-base text-color p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+    </div>
+    <div class="field col-12 md:col-6">
+      <label for="telephone">Telefone</label>
+      <input formControlName="telephone" pInputText id="telephone" type="text"
+        class="text-base text-color p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+    </div>
+  </div>
+</div>
+<p-divider>Endereço</p-divider>
+
+<div class="card">
+  <div [formGroup]="form" class="formgrid grid">
+    <div class="field col-12 md:col-6">
+      <label for="zip">CEP</label>
+      <input formControlName="zip" pInputText id="zip" type="text"
+        class="text-base text-color p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+        (blur)="onCepBlur()">
+    </div>
+    <div class="field col-12 md:col-6">
+      <label for="backYard">Quadra</label>
+      <input formControlName="backYard" pInputText id="backYard" type="text"
+        class="text-base text-color p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+    </div>
+    <div class="field col-12 md:col-6">
+      <label for="addressLine">Numero</label>
+      <input formControlName="addressLine" pInputText id="addressLine" type="text"
+        class="text-base text-color p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+    </div>
+    <div class="field col-12 md:col-6">
+      <label for="city">Cidade</label>
+      <input formControlName="city" pInputText id="city" type="text"
+        class="text-base text-color p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+    </div>
+    <div class="field col-12 md:col-6">
+      <label for="neighborhood">Bairro</label>
+      <input formControlName="neighborhood" pInputText id="neighborhood" type="text"
+        class="text-base text-color p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+    </div>
+    <div class="field col-12 md:col-6">
+      <label for="state">Estado</label>
+      <input formControlName="state" pInputText id="state" type="text"
+        class="text-base text-color p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+    </div>
+    <div class="field col-12 md:col-6">
+      <label for="addressLine2">Complemento</label>
+      <input formControlName="addressLine2" pInputText id="addressLine2" type="text"
+        class="text-base text-color p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+    </div>
+    <div class="field col-12">
+      <button pButton type="button" label="Salvar dados" (click)="saveCompany()"></button>
+    </div>
+  </div>
+</div>
+
+<app-upload-page></app-upload-page>
+<p-toast></p-toast>

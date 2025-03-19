@@ -1,0 +1,45 @@
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; /* Ajuste conforme necessário */
+  display: inline-block;
+  vertical-align: middle;
+}
+
+
+.form-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  padding-top: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.p-inputtext, .p-inputnumber {
+  width: 100%;
+}
+
+@media (max-width: 450px) {
+  .form-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-item, .buttons-container {
+    width: 100%;
+  }
+}

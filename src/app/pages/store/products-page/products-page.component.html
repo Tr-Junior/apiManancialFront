@@ -1,0 +1,215 @@
+<div class="card p-3">
+  <p-toast></p-toast>
+  <app-product-registration-page class="hide-on-small" (productSaved)="listProd()"></app-product-registration-page>
+  <!-- Toolbar - Visível apenas em telas menores que 500px -->
+  <p-toolbar styleClass="mb-4 gap-2 show-on-small">
+    <ng-template pTemplate="left">
+      <p-button severity="success" label="Novo" icon="pi pi-plus" class="mr-2" (onClick)="showDialog()">
+      </p-button>
+      <p-dialog header="Novo Produto" [(visible)]="displayDialog" [modal]="true" [closable]="true">
+        <app-product-registration-page (onCancel)="closeDialog()"
+          (productSaved)="listProd()"></app-product-registration-page>
+      </p-dialog>
+
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <p-button severity="help" label="Exportar" icon="pi pi-file-excel" (onClick)="exportToExcel()"></p-button>
+    </ng-template>
+  </p-toolbar>
+  <!-- Data Table -->
+  <p-table dataKey="_id" editMode="row" [paginator]="true" [rows]="limit" [first]="offset" [totalRecords]="total"
+    [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} produtos"
+    [rowsPerPageOptions]="[100, 150, 200, 250, 350, 500]" [tableStyle]="{'min-width': '50rem'}"
+    styleClass="p-datatable-striped" [value]="filteredProducts" [lazy]="true" (onPage)="pageChange($event)">
+
+    <!-- Caption with Search -->
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between gap-3">
+        <!-- Campo de Pesquisa -->
+        <div class="flex align-items-center gap-2">
+          <p-iconField iconPosition="left">
+            <p-inputIcon styleClass="pi pi-search"></p-inputIcon>
+            <input type="text" pAutoFocus [autofocus]="true" pInputText placeholder="Pesquisar produtos..."
+              [(ngModel)]="searchQuery" (ngModelChange)="search()" />
+          </p-iconField>
+          <p-button icon="pi pi-times" styleClass="p-button-danger p-button-text" (onClick)="clearSearch()"
+            [disabled]="!searchQuery"></p-button>
+        </div>
+
+        <!-- Botão Exportar -->
+        <p-button severity="help" label="Exportar" icon="pi pi-file-excel" (onClick)="exportToExcel()"
+          class="export-button">
+        </p-button>
+      </div>
+    </ng-template>
+
+
+    <!-- Header -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th pSortableColumn="title">
+          Produto<p-sortIcon field="title"></p-sortIcon>
+        </th>
+        <th pSortableColumn="quantity">
+          Estoque<p-sortIcon field="quantity"></p-sortIcon>
+        </th>
+        <th pSortableColumn="orcamentos">
+          Em orçamentos<p-sortIcon field="orcamentos"></p-sortIcon>
+        </th>
+        <th pSortableColumn="supplier.name">
+          Fornecedor<p-sortIcon field="supplier.name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="purchasePrice">
+          Valor de Compra<p-sortIcon field="purchasePrice"></p-sortIcon>
+        </th>
+        <th pSortableColumn="price">
+          Valor de venda<p-sortIcon field="price"></p-sortIcon>
+        </th>
+        <th>Ações</th>
+      </tr>
+    </ng-template>
+
+    <!-- Body -->
+    <ng-template pTemplate="body" let-product let-editing="editing" let-ri="rowIndex">
+      <tr [pEditableRow]="product" [attr.id]="'productRow_' + product._id">
+        <td style="text-align: center">
+          {{ri+1}}
+        </td>
+        <td style="text-align: center">
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input style=" width: 100%;" pInputText type="text" [(ngModel)]="selectedProduct.title" required>
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{product.title}}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td style="text-align: center">
+          <p-cellEditor>
+            <!-- Modo de Edição -->
+            <ng-template pTemplate="input">
+              <input size="3" pInputText type="text" pKeyFilter="num" id="number"
+                onkeypress="return event.charCode >= 48 && event.charCode <= 57" [(ngModel)]="selectedProduct.quantity"
+                required>
+            </ng-template>
+            <ng-template pTemplate="output">
+              <div pTooltip="Em orçamentos: {{ getQuantityInBudget(product._id).quantity }}
+                             Clientes: {{ getQuantityInBudget(product._id).clients.join(', ') }}" tooltipPosition="top"
+                [ngClass]="{
+                  'outofstock': (product.quantity - getQuantityInBudget(product._id).quantity) === 0,
+                  'lowstock': ((product.quantity - getQuantityInBudget(product._id).quantity) > 0 &&
+                              (product.quantity - getQuantityInBudget(product._id).quantity) <= product.min_quantity),
+                  'instock': ((product.quantity - getQuantityInBudget(product._id).quantity) >= 1)
+                }">
+                <span *ngIf="(product.quantity - getQuantityInBudget(product._id).quantity) > 0">
+                  {{ product.quantity - getQuantityInBudget(product._id).quantity }}
+                </span>
+
+                <span *ngIf="(product.quantity - getQuantityInBudget(product._id).quantity) === 0" class="badge">
+                  Fora de Estoque
+                </span>
+              </div>
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+
+        <td style="text-align: center">
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <span>{{ getQuantityInBudget(product._id).quantity}}</span>
+            </ng-template>
+            <ng-template pTemplate="output">
+              <div class="min-stok">
+                <span>{{ getQuantityInBudget(product._id).quantity}}</span>
+              </div>
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <td style="text-align: center">
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <p-autoComplete [appendTo]="'body'" [size]="3" [(ngModel)]="selectedProduct.supplier"
+                [suggestions]="filteredSuppliers" (completeMethod)="filterSuppliers($event)" field="name"
+                [dropdown]="true" placeholder="Selecione um fornecedor">
+                <ng-template let-supplier pTemplate="item">
+                  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <span>{{ supplier.name }}</span>
+                    <button pButton type="button" icon="pi pi-trash" class="p-button-text p-button-danger small"
+                      (click)="deleteSupplier(supplier, $event)" size="small">
+                    </button>
+                  </div>
+                </ng-template>
+              </p-autoComplete>
+
+            </ng-template>
+            <ng-template pTemplate="output">
+              <span style="text-transform: uppercase;">
+                {{ product.supplier ? product.supplier.name : 'Sem Fornecedor' }}
+              </span>
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <td style="text-align: center">
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <p-inputGroup>
+                <p-inputGroupAddon>R$</p-inputGroupAddon>
+                <p-inputNumber size="6" id="editedPrice" [(ngModel)]="selectedProduct.purchasePrice"
+                  inputId="minmaxfraction" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" />
+              </p-inputGroup>
+              <!-- <input pInputText size="6" id="editedPrice" [(ngModel)]="selectedProduct.purchasePrice" currencyMask
+                [options]="{ prefix: 'R$ ', thousands: '.', decimal: ',' }" /> -->
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{product.purchasePrice | currency: 'BRL':'symbol':'1.2-2' }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td style="text-align: center">
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <p-inputGroup>
+                <p-inputGroupAddon>R$</p-inputGroupAddon>
+                <p-inputNumber size="6" id="editedPrice" [(ngModel)]="selectedProduct.price" inputId="minmaxfraction"
+                  mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="5" />
+              </p-inputGroup>
+              <!-- <input pInputText size="6" id="editedPrice" [(ngModel)]="selectedProduct.price" currencyMask
+                [options]="{ prefix: 'R$ ', thousands: '.', decimal: ',' }" /> -->
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{product.price | currency: 'BRL':'symbol':'1.2-2' }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td style="text-align: center">
+          <div class="flex align-items-center justify-content-center gap-3">
+            <p-button *ngIf="!editing" icon="pi pi-cart-plus"
+              styleClass="p-button-rounded p-button-success p-button-outlined" (click)="addToBox(product)">
+            </p-button>
+            <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil"
+              (click)="onRowEditInit(product)" class="p-button-rounded p-button-warning p-button-outlined">
+            </button>
+            <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check"
+              (click)="onRowEditSave(product)" class="p-button-rounded p-button-text p-button-success mr-2">
+            </button>
+            <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times"
+              (click)="onRowEditCancel(product)" class="p-button-rounded p-button-text p-button-danger">
+            </button>
+            <p-button *ngIf="!editing" icon="pi pi-trash"
+              styleClass="p-button-rounded p-button-danger p-button-outlined"
+              (click)="confirmDelete(product._id)"></p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <p-confirmDialog></p-confirmDialog>
+</div>
