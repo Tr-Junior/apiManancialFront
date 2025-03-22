@@ -320,129 +320,170 @@ export class BoxPageComponent implements OnInit, OnDestroy{
     await this.loadCart();
   }
 
-  paymentMethods = ['Débito', 'Crédito', 'Pix', 'Dinheiro'];
-  payments: { method: string, amount: number }[] = [];
-  isSplitPayment: boolean = false;
-  selectedPaymentMethod: string = '';
-  paymentAmount: number = 0;
- calculateTotals(): void {
-  this.subtotal = this.boxItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  this.grandTotal = this.subtotal * (1 - this.generalDiscount / 100);
-  this.calcTroco();
-  this.updatePaymentAmount(); // Atualiza o valor automaticamente
+ paymentMethods = ['Débito', 'Crédito', 'Pix', 'Dinheiro', 'Outros'];
+payments: { method: string, amount: number }[] = [];
+selectedPaymentMethod: string = '';
+firstPaymentMethod: string = '';
+secondPaymentMethod: string = '';
+firstPaymentAmount: number = 0;
+secondPaymentAmount: number = 0;
+isSplitPayment: boolean = false;
+loadingBudget: boolean = false; // Controla o botão "Salvar Orçamento"
+
+onPaymentMethodChange() {
+  if (this.selectedPaymentMethod !== 'Outros') {
+    this.firstPaymentMethod = '';
+    this.secondPaymentMethod = '';
+    this.firstPaymentAmount = this.grandTotal; // Assume pagamento total na forma única
+    this.secondPaymentAmount = 0;
+    this.payments = [{ method: this.selectedPaymentMethod, amount: this.firstPaymentAmount }];
+  } else {
+    this.firstPaymentAmount = 0;
+    this.secondPaymentAmount = 0;
+    this.payments = [];
+  }
 }
 
-  calcTroco(): void {
-    const totalPaid = this.payments.reduce((sum, payment) => sum + payment.amount, 0);
+updatePaymentAmounts() {
+  if (this.selectedPaymentMethod !== 'Outros') return;
 
-    // Garante que o valor total pago inclua o valor recebido pelo usuário
-    const totalReceived = this.total || totalPaid;
+  // Garante que os valores são números válidos
+  this.firstPaymentAmount = this.firstPaymentAmount || 0;
+  this.secondPaymentAmount = this.secondPaymentAmount || 0;
 
-    // Calcula o troco corretamente
-    this.totalTroco = Math.max(0, totalReceived - this.grandTotal);
+  // Se ambos os valores estiverem preenchidos, recalcula proporcionalmente ao novo total
+  const totalPreenchido = this.firstPaymentAmount + this.secondPaymentAmount;
+  if (totalPreenchido > 0) {
+    const proporcaoPrimeiro = this.firstPaymentAmount / totalPreenchido;
+    const proporcaoSegundo = this.secondPaymentAmount / totalPreenchido;
+
+    this.firstPaymentAmount = this.grandTotal * proporcaoPrimeiro;
+    this.secondPaymentAmount = this.grandTotal * proporcaoSegundo;
+  } else {
+    // Caso contrário, mantém a lógica normal de distribuição
+    const remainingAmount = this.grandTotal - this.firstPaymentAmount;
+    this.secondPaymentAmount = remainingAmount > 0 ? remainingAmount : 0;
   }
 
-
-  updateGeneralDiscount(discount: number): void {
-    this.generalDiscount = discount;
-    this.calculateTotals(); // Recalcular o total com desconto
-  }
-
-  updatePaymentAmount(): void {
-    if (!this.selectedPaymentMethod) return;
-
-    // Calcula quanto falta pagar
-    const totalPaid = this.payments.reduce((sum, payment) => sum + payment.amount, 0);
-    const remainingAmount = Math.max(0, this.grandTotal - totalPaid);
-
-    // Atualiza o valor do pagamento automaticamente
-    this.paymentAmount = remainingAmount;
-  }
+  this.addPayment();
+}
 
 
 
-  addPayment(method: string, amount: number): void {
-    if (!method || amount <= 0) return;
+addPayment() {
+  this.payments = []; // Sempre limpa antes de adicionar os pagamentos atualizados
 
-    const existingPayment = this.payments.find(p => p.method === method);
-    if (existingPayment) {
-      existingPayment.amount = amount;
-    } else {
-      this.payments.push({ method, amount });
+  if (this.selectedPaymentMethod === 'Outros') {
+    if (!this.firstPaymentMethod || !this.secondPaymentMethod || this.firstPaymentAmount <= 0 || this.secondPaymentAmount <= 0) {
+      return;
     }
 
-    this.selectedPaymentMethod = '';
-    this.paymentAmount = 0;
+    this.payments.push(
+      { method: this.firstPaymentMethod, amount: this.firstPaymentAmount },
+      { method: this.secondPaymentMethod, amount: this.secondPaymentAmount }
+    );
+  } else {
+    if (!this.selectedPaymentMethod || this.firstPaymentAmount <= 0) {
+      return;
+    }
 
-    this.calcTroco(); // Atualiza o troco sempre que um pagamento for adicionado
-    this.updatePaymentAmount();
+    this.payments.push({ method: this.selectedPaymentMethod, amount: this.firstPaymentAmount });
   }
 
+}
 
-  removePayment(index: number): void {
-    this.payments.splice(index, 1);
-    this.calcTroco();
-    this.updatePaymentAmount();
+
+
+calcTroco() {
+  const totalPaid = this.payments.reduce((sum, payment) => sum + payment.amount, 0);
+  const totalReceived = this.total || totalPaid;
+  this.totalTroco = Math.max(0, totalReceived - this.grandTotal);
+}
+
+updateGeneralDiscount(discount: number): void {
+  this.generalDiscount = discount;
+  this.calculateTotals();
+}
+
+calculateTotals(): void {
+  this.subtotal = this.boxItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  this.grandTotal = this.subtotal * (1 - this.generalDiscount / 100);
+
+  // Atualiza os valores dos pagamentos sempre que o total mudar
+  if (this.selectedPaymentMethod === 'Outros') {
+    this.updatePaymentAmounts();
   }
 
+  this.calcTroco();
+}
 
-  submitOrder(): void {
-    const validItems = this.boxItems.filter(item => item.quantity > 0);
 
-    if (validItems.length === 0) {
+submitOrder(): void {
+  const validItems = this.boxItems.filter(item => item.quantity > 0);
+  if (validItems.length === 0) {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: 'Adicione itens válidos ao caixa antes de finalizar a venda.'
+    });
+    return;
+  }
+
+  if (this.payments.length === 0) {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: 'Selecione pelo menos uma forma de pagamento antes de finalizar a venda.'
+    });
+    return;
+  }
+ this.loading = true;
+  const order = this.createOrderObject(validItems);
+
+
+  setTimeout(() => {
+    this.orderService.createOrder(order).subscribe({
+      next: () => {
         this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Adicione itens válidos ao caixa antes de finalizar a venda.'
+          severity: 'success',
+          summary: 'Venda Finalizada',
+          detail: 'Pedido realizado com sucesso!'
         });
-        return;
-    }
-
-    const order = this.createOrderObject(validItems);
-    this.loading = true; // Ativa o loading
-
-    setTimeout(() => {
-        this.orderService.createOrder(order).subscribe({
-            next: () => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Venda Finalizada',
-                    detail: 'Pedido realizado com sucesso!'
-                });
-                this.clearBox();
-                this.payments = [];
-                this.clearSearch();
-                this.isSplitPayment = false;
-            },
-            error: err => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Erro',
-                    detail: 'Falha ao finalizar a venda: ' + (err.message || 'Erro desconhecido.')
-                });
-            }
+        this.clearBox();
+        this.payments = []; // Reseta os pagamentos APÓS a venda
+        this.clearSearch();
+        this.isSplitPayment = false;
+      },
+      error: err => {
+        console.error('Erro na requisição:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao finalizar a venda: ' + (err.message || 'Erro desconhecido.')
         });
-        this.loading = false;
-    }, 500);
-  }
+      }
+    });
+    this.loading = false;
+  }, 1000);
+}
 
-  private createOrderObject(validItems: any[]): any {
-    return {
-        customer: this.user._id,
-        sale: {
-            items: validItems.map(item => ({
-                quantity: item.quantity,
-                price: item.price,
-                discount: item.discount || 0,
-                title: item.title,
-                product: item._id
-            })),
-            discount: this.generalDiscount,
-            total: this.grandTotal
-        },
-        payments: this.payments
-    };
-  }
+private createOrderObject(validItems: any[]): any {
+  return {
+    customer: this.user._id,
+    sale: {
+      items: validItems.map(item => ({
+        quantity: item.quantity,
+        price: item.price,
+        discount: item.discount || 0,
+        title: item.title,
+        product: item._id
+      })),
+      discount: this.generalDiscount,
+      total: this.grandTotal
+    },
+    payments: this.payments
+  };
+}
 
 
 listBudget() {
@@ -473,6 +514,7 @@ loadCustomerNames() {
 
 
 async createBudget() {
+  this.loadingBudget = true;
   try {
     const cartItems = await this.boxService.getItems(); // Recupera os itens do caixa
 
@@ -510,6 +552,7 @@ async createBudget() {
     this.totalTroco = 0;
     this.listBudget();
     this.loadCustomerNames();
+    this.loadingBudget = false;
   } catch (err: any) {
     console.error(err);
     this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.message });

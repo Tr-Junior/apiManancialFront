@@ -114,55 +114,59 @@
   </div>
 </div>
 
-<!-- Resumo do Caixa -->
-<div class="col-12 p-0 ">
+<div class="col-12 p-0">
   <div class="card px-4 pt-4">
     <div class="p-fluid p-formgrid grid p-0">
+
+      <!-- Forma de Pagamento -->
       <div class="col-12 md:col-3">
         <span class="text-lg">Forma de Pagamento</span>
 
         <div class="mt-2">
           <p-dropdown [options]="paymentMethods" [(ngModel)]="selectedPaymentMethod"
-            placeholder="Selecione a forma de pagamento" (onChange)="updatePaymentAmount()">
+            placeholder="Selecione a forma de pagamento" (onChange)="onPaymentMethodChange()">
           </p-dropdown>
         </div>
 
-        <div class="mt-2">
-          <p-inputNumber [(ngModel)]="paymentAmount" placeholder="Valor" class="w-full" currency="BRL" prefix="R$ "
-            [minFractionDigits]="2" [maxFractionDigits]="2" />
+        <!-- Quando a opção for "Outros", exibe os dropdowns e inputs para valores -->
+        <div class="mt-2" *ngIf="selectedPaymentMethod === 'Outros'">
+          <div class="p-fluid p-formgrid grid">
+            <div class="col-12 md:col-5">
+              <p-dropdown [options]="paymentMethods" [(ngModel)]="firstPaymentMethod"
+                placeholder="Primeira Forma de Pagamento" (onChange)="updatePaymentAmounts()">
+              </p-dropdown>
+            </div>
+
+            <div class="col-12 md:col-5">
+              <p-dropdown [options]="paymentMethods" [(ngModel)]="secondPaymentMethod"
+                placeholder="Segunda Forma de Pagamento" (onChange)="updatePaymentAmounts()">
+              </p-dropdown>
+            </div>
+
+            <div class="col-12 md:col-5">
+              <p-inputNumber [(ngModel)]="firstPaymentAmount" placeholder="Valor" class="w-full" currency="BRL"
+                prefix="R$ " [minFractionDigits]="2" [maxFractionDigits]="2"
+                (onInput)="updatePaymentAmounts()"></p-inputNumber>
+            </div>
+
+            <div class="col-12 md:col-5">
+              <p-inputNumber [(ngModel)]="secondPaymentAmount" placeholder="Valor" class="w-full" currency="BRL"
+                prefix="R$ " [minFractionDigits]="2" [maxFractionDigits]="2"
+                (onInput)="updatePaymentAmounts()"></p-inputNumber>
+            </div>
+          </div>
         </div>
 
-
-        <div class=" mt-2">
-          <button pButton label="Adicionar" (click)="addPayment(selectedPaymentMethod, paymentAmount)"
-            [disabled]="!selectedPaymentMethod || paymentAmount <= 0">
-          </button>
-        </div>
       </div>
-
-      <div class="mt-2 col-12 md:col-2">
-        <span class="text-lg">Pagamentos</span>
-        <ul>
-          <li *ngFor="let payment of payments; let i = index">
-            {{ payment.method }}: {{ payment.amount | currency:'BRL' }}
-            <button pButton icon="pi pi-trash" class="p-button-text" (click)="removePayment(i)"></button>
-          </li>
-        </ul>
-      </div>
-
 
       <!-- Desconto -->
-
       <div class="col-12 md:col-2">
         <span class="text-lg mr-2">Desconto</span>
         <div class="flex align-items-center gap-2 mt-2">
           <p-inputNumber [(ngModel)]="generalDiscount" (onInput)="updateGeneralDiscount(generalDiscount)" mode="decimal"
-            prefix="%" styleClass="small-input">
-          </p-inputNumber>
+            prefix="%" styleClass="small-input"></p-inputNumber>
         </div>
       </div>
-
-
       <div class="space">
 
       </div>
@@ -190,7 +194,6 @@
           [options]="{ prefix: 'R$ ', thousands: '.', decimal: ',' }" #valueInput>
       </div>
 
-
       <!-- Valor do Troco -->
       <div class="col-12 md:col-8">
         <span class="text-lg">Troco:</span>
@@ -202,23 +205,14 @@
       <!-- Botão Finalizar -->
       <div class="col-12 md:col-2">
         <p-button label="Finalizar Venda" icon="pi pi-check" (click)="submitOrder()" size="large" styleClass="w-full"
-          [disabled]="loading" [loading]="loading">
-        </p-button>
+          [disabled]="loading" [loading]="loading"></p-button>
       </div>
-      <div class="col-12 md:col-2 text-center md:text-left btn2">
-        <!-- <p-splitButton class="pdf" label="Salvar" icon="pi pi-save" [model]="items"></p-splitButton> -->
-        <p-button class="button" severity="success" icon="pi pi-file-pdf" iconPos="right" label="Salvar PDF"
-          (click)="saveBoxAsPdf()"></p-button>
-      </div>
-      <div class="col-12 md:col-2 text-center md:text-left btn2">
-        <!-- <p-splitButton class="pdf" label="Salvar" icon="pi pi-save" [model]="items"></p-splitButton> -->
-        <p-button class="button" severity="info" icon="pi pi-receipt" iconPos="right" label="Imprimir cupom"
-          (click)="printReceipt()"></p-button>
 
-      </div>
     </div>
   </div>
 </div>
+
+
 
 <p-divider>Orçamentos</p-divider>
 <div class="col-12 p-0 ">
@@ -229,8 +223,8 @@
           (completeMethod)="filterCustomer($event)" [dropdown]="true" placeholder="Nome do Cliente"></p-autoComplete>
       </div>
       <div class="col-12 md:col-2 text-center md:text-left btn2">
-        <p-button class="button" icon="pi pi-id-card" iconPos="right" label="Salvar orçamento"
-          (click)="createBudget()"></p-button>
+        <p-button class="button" icon="pi pi-id-card" iconPos="right" label="Salvar orçamento" (click)="createBudget()"
+          [disabled]="loadingBudget" [loading]="loadingBudget"></p-button>
       </div>
     </div>
   </div>
