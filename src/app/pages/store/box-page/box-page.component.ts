@@ -74,10 +74,20 @@ export class BoxPageComponent implements OnInit, OnDestroy{
       this.calculateTotals();
     });
 
-    this.searchSubject.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    // Adiciona debounce para evitar requisições excessivas
+    this.searchSubject.pipe(
+      debounceTime(300), // Aguarda 300ms sem digitação antes de pesquisar
+      takeUntil(this.destroy$)
+    ).subscribe(query => {
+      const trimmedQuery = query.trim();
+
+      if (!trimmedQuery.length) {
+        this.clearSearch(); // Limpa os produtos quando o campo fica vazio
+        return;
+      }
+
       this.search(1, true);
     });
-
   }
 
   ngOnDestroy(): void {
@@ -165,8 +175,10 @@ export class BoxPageComponent implements OnInit, OnDestroy{
   }
 
   clearSearch(): void {
-    this.searchQuery = '';
-    this.products = [];
+    this.searchQuery = ''; // Limpa o campo de pesquisa
+    this.products = []; // Zera a lista de produtos
+    this.totalRecords = 0;
+    this.currentPage = 1;
   }
 
   async loadCart() {
