@@ -31,7 +31,7 @@
       <div class="flex align-items-center gap-2">
         <div class="flex align-items-center gap-2 cursor-pointer" (click)="userOverlay.toggle($event)">
           <p-avatar label="{{ user.name.charAt(0) }}" shape="circle" styleClass="mr-2 bg-primary text-white"></p-avatar>
-          <span class="text-lg font-semibold">{{ user.name }}</span>
+          <span class="text-lg font-semibold">{{ user.name | titlecase }}</span>
           <i class="pi pi-angle-down text-lg"></i>
         </div>
         <p-overlayPanel #userOverlay [dismissable]="true">

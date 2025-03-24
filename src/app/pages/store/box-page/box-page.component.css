@@ -13,7 +13,7 @@
 
 
 :host ::ng-deep .p-datatable tbody tr:hover {
-  background-color: #ffffff36 !important;
+  background-color: #27262633 !important;
   cursor: pointer;
 }
 

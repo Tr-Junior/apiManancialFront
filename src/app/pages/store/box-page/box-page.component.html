@@ -207,7 +207,17 @@
         <p-button label="Finalizar Venda" icon="pi pi-check" (click)="submitOrder()" size="large" styleClass="w-full"
           [disabled]="loading" [loading]="loading"></p-button>
       </div>
+      <div class="col-12 md:col-2 text-center md:text-left btn2">
+        <!-- <p-splitButton class="pdf" label="Salvar" icon="pi pi-save" [model]="items"></p-splitButton> -->
+        <p-button class="button" severity="success" icon="pi pi-file-pdf" iconPos="right" label="Salvar PDF"
+          (click)="saveBoxAsPdf()"></p-button>
+      </div>
+      <div class="col-12 md:col-2 text-center md:text-left btn2">
+        <!-- <p-splitButton class="pdf" label="Salvar" icon="pi pi-save" [model]="items"></p-splitButton> -->
+        <p-button class="button" severity="info" icon="pi pi-receipt" iconPos="right" label="Imprimir cupom"
+          (click)="printReceipt()"></p-button>
 
+      </div>
     </div>
   </div>
 </div>

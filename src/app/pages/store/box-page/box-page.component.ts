@@ -351,22 +351,12 @@ updatePaymentAmounts() {
   this.firstPaymentAmount = this.firstPaymentAmount || 0;
   this.secondPaymentAmount = this.secondPaymentAmount || 0;
 
-  // Se ambos os valores estiverem preenchidos, recalcula proporcionalmente ao novo total
-  const totalPreenchido = this.firstPaymentAmount + this.secondPaymentAmount;
-  if (totalPreenchido > 0) {
-    const proporcaoPrimeiro = this.firstPaymentAmount / totalPreenchido;
-    const proporcaoSegundo = this.secondPaymentAmount / totalPreenchido;
-
-    this.firstPaymentAmount = this.grandTotal * proporcaoPrimeiro;
-    this.secondPaymentAmount = this.grandTotal * proporcaoSegundo;
-  } else {
-    // Caso contrário, mantém a lógica normal de distribuição
-    const remainingAmount = this.grandTotal - this.firstPaymentAmount;
-    this.secondPaymentAmount = remainingAmount > 0 ? remainingAmount : 0;
-  }
+  // Define o segundo pagamento como a diferença entre o total e o primeiro valor
+  this.secondPaymentAmount = Math.max(this.grandTotal - this.firstPaymentAmount, 0);
 
   this.addPayment();
 }
+
 
 
 
@@ -561,13 +551,24 @@ async createBudget() {
 
 async clearBox() {
   await this.boxService.clearBox();
-    await this.loadCart();
-    this.grandTotal = 0;
-    this.subtotal = 0;
-    this.totalTroco = 0;
-    this.total = null;
-    this.generalDiscount = 0;
+  await this.loadCart();
+
+  this.grandTotal = 0;
+  this.subtotal = 0;
+  this.totalTroco = 0;
+  this.total = null;
+  this.generalDiscount = 0;
+
+  // Resetando formas de pagamento
+  this.payments = [];
+  this.selectedPaymentMethod = '';
+  this.firstPaymentMethod = '';
+  this.secondPaymentMethod = '';
+  this.firstPaymentAmount = 0;
+  this.secondPaymentAmount = 0;
+  this.isSplitPayment = false;
 }
+
 
 
 getQuantityInBudget(productId: string): { quantity: number, clients: string[] } {
